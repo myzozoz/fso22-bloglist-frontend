@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import './index.css'
+
+const ErrorMessage = ({ message }) => <div className={'error'}>{message}</div>
+
+const SuccessMessage = ({ message }) => <div className="success">{message}</div>
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -11,6 +16,8 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [successMessage, setSuccessMessage] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
@@ -24,6 +31,13 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
+
+  const setTempMessage = (message, error = false, timeout = 5000) => {
+    const setFunction = error ? setErrorMessage : setSuccessMessage
+
+    setFunction(message)
+    setTimeout(() => setFunction(null), timeout)
+  }
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -40,8 +54,13 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      setTempMessage(`Successfully logged in! Welcome ${user.name}`)
     } catch (exception) {
       console.log(exception)
+      setTempMessage(
+        `Could not log in! Please check username and password.`,
+        true
+      )
     }
   }
 
@@ -51,23 +70,30 @@ const App = () => {
 
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
+    setTempMessage('Logged out')
   }
 
   const handleBlogSubmit = async (event) => {
     event.preventDefault()
     console.log(`submitting new blog ${title}/${author}/${url}`)
+    try {
+      const response = await blogService.create({
+        title,
+        author,
+        url,
+      })
 
-    const response = await blogService.create({
-      title,
-      author,
-      url,
-    })
-
-    setBlogs([...blogs, response])
-    setTitle('')
-    setAuthor('')
-    setUrl('')
-    console.log('response:', response)
+      setBlogs([...blogs, response])
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+      console.log('response:', response)
+      setTempMessage(
+        `Successfully added new blog (${response.title} by ${response.author})`
+      )
+    } catch (exception) {
+      setTempMessage(`Could not create new blog!`, true)
+    }
   }
 
   const loginForm = () => (
@@ -140,7 +166,13 @@ const App = () => {
     </>
   )
 
-  return <div>{user === null ? loginForm() : blogList()}</div>
+  return (
+    <div>
+      {errorMessage && <ErrorMessage message={errorMessage} />}
+      {successMessage && <SuccessMessage message={successMessage} />}
+      {user === null ? loginForm() : blogList()}
+    </div>
+  )
 }
 
 export default App
