@@ -1,10 +1,11 @@
-const BlogDetails = ({ blog, handleLike }) => (
+const BlogDetails = ({ blog, handleLike, showDelete, handleDelete }) => (
   <>
     <div>{blog.url}</div>
     <div>
       likes: {blog.likes} <button onClick={handleLike}>like</button>
     </div>
     <div>{blog.user && blog.user.name}</div>
+    {showDelete && <button onClick={handleDelete}>remove</button>}
   </>
 )
 

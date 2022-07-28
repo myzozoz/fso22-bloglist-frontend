@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import BlogDetails from './BlogDetails'
 
-const Blog = ({ blog, handleLike }) => {
+const Blog = ({ blog, handleLike, showDelete, handleDelete }) => {
   const [compact, setCompact] = useState(true)
 
   const blogStyle = {
@@ -19,7 +19,14 @@ const Blog = ({ blog, handleLike }) => {
       <div onClick={() => setCompact(!compact)}>
         {blog.title} {blog.author} <button>{compact ? 'view' : 'hide'}</button>
       </div>
-      {!compact && <BlogDetails blog={blog} handleLike={handleLike} />}
+      {!compact && (
+        <BlogDetails
+          blog={blog}
+          handleLike={handleLike}
+          handleDelete={handleDelete}
+          showDelete={showDelete}
+        />
+      )}
     </div>
   )
 }
