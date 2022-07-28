@@ -100,6 +100,24 @@ const App = () => {
     }
   }
 
+  const handleLike = (blog) => async (event) => {
+    event.preventDefault()
+    try {
+      console.log('blog to update', blog)
+      const updated = await blogService.update({
+        ...blog,
+        likes: blog.likes + 1,
+      })
+      const i = blogs.findIndex((b) => b.id === updated.id)
+      console.log('old vs new blog', blog, updated)
+      const newBlogs = [...blogs]
+      newBlogs[i] = { ...newBlogs[i], likes: updated.likes }
+      setBlogs(newBlogs)
+    } catch (exception) {
+      console.log(exception)
+    }
+  }
+
   const blogList = () => (
     <>
       <p>{user.name} logged in</p>
@@ -116,7 +134,7 @@ const App = () => {
       </Togglable>
 
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} handleLike={handleLike(blog)} />
       ))}
     </>
   )
