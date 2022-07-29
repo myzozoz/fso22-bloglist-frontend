@@ -63,7 +63,7 @@ const App = () => {
     } catch (exception) {
       console.log(exception)
       setTempMessage(
-        `Could not log in! Please check username and password.`,
+        'Could not log in! Please check username and password.',
         true
       )
     }
@@ -96,7 +96,7 @@ const App = () => {
         `Successfully added new blog (${response.title} by ${response.author})`
       )
     } catch (exception) {
-      setTempMessage(`Could not create new blog!`, true)
+      setTempMessage('Could not create new blog!', true)
     }
   }
 
