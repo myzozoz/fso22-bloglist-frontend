@@ -38,16 +38,10 @@ describe('Blog app', function () {
 
   describe('When logged in', function () {
     beforeEach(function () {
-      cy.request('POST', 'http://localhost:3003/api/login', {
-        username: 'Marcel',
-        password: 'marcel',
-      }).then((response) => {
-        localStorage.setItem('loggedBlogappUser', JSON.stringify(response.body))
-        cy.visit('http://localhost:3000')
-      })
+      cy.login({ username: 'Marcel', password: 'marcel' })
     })
 
-    it.only('A blog can be created', function () {
+    it('A blog can be created', function () {
       cy.contains('create new').click()
       cy.get('#title').type('A nice new blog')
       cy.get('#author').type('Marquez')
@@ -55,6 +49,26 @@ describe('Blog app', function () {
       cy.contains('submit').click()
 
       cy.contains('Successfully added new blog (A nice new blog by Marquez)')
+    })
+
+    describe('When blogs exist', function () {
+      beforeEach(function () {
+        cy.createBlog({
+          title: 'A nice new blog',
+          author: 'Marquez',
+          url: 'https://coobleans.nowhere',
+          likes: '1',
+        })
+      })
+
+      it.only('Can like a blog', function () {
+        cy.contains('A nice new blog').parent().parent().as('theBlog')
+        cy.get('@theBlog').contains('view').click()
+        cy.get('@theBlog').should('contain', '1')
+
+        cy.get('@theBlog').contains('like').click()
+        cy.get('@theBlog').should('contain', '2')
+      })
     })
   })
 })
