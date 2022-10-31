@@ -23,7 +23,7 @@ describe('Blog app', function () {
       cy.contains('Successfully logged in! Welcome Make')
     })
 
-    it.only('fails with wrong credentials', function () {
+    it('fails with wrong credentials', function () {
       cy.get('#username').type('Marcel')
       cy.get('#password').type('wrongpassword')
       cy.get('#login-button').click()
@@ -33,6 +33,28 @@ describe('Blog app', function () {
           'Could not log in! Please check username and password.'
         )
         .and('have.css', 'color', 'rgb(255, 0, 0)')
+    })
+  })
+
+  describe('When logged in', function () {
+    beforeEach(function () {
+      cy.request('POST', 'http://localhost:3003/api/login', {
+        username: 'Marcel',
+        password: 'marcel',
+      }).then((response) => {
+        localStorage.setItem('loggedBlogappUser', JSON.stringify(response.body))
+        cy.visit('http://localhost:3000')
+      })
+    })
+
+    it.only('A blog can be created', function () {
+      cy.contains('create new').click()
+      cy.get('#title').type('A nice new blog')
+      cy.get('#author').type('Marquez')
+      cy.get('#url').type('https://coolbeans.nowhere')
+      cy.contains('submit').click()
+
+      cy.contains('Successfully added new blog (A nice new blog by Marquez)')
     })
   })
 })
