@@ -45,7 +45,6 @@ describe('Blog', () => {
     const user = userEvent.setup()
     await user.click(buttonElement)
 
-    screen.debug()
     screen.getByText(blog.url)
     screen.getByText(blog.likes, { exact: false })
   })
