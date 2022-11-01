@@ -16,7 +16,7 @@ const Blog = ({ blog, handleLike, showDelete, handleDelete }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} id="blog" className={'blog-class'}>
       <div onClick={() => setCompact(!compact)}>
         {blog.title} {blog.author} <button>{compact ? 'view' : 'hide'}</button>
       </div>

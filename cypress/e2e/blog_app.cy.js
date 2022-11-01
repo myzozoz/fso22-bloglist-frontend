@@ -62,6 +62,18 @@ describe('Blog app', function () {
           url: 'https://coobleans.nowhere',
           likes: '1',
         })
+        cy.createBlog({
+          title: 'Most likes',
+          author: 'Marquez',
+          url: 'https://coobleans.nowhere',
+          likes: '101',
+        })
+        cy.createBlog({
+          title: 'Second most likes',
+          author: 'Marquez',
+          url: 'https://coobleans.nowhere',
+          likes: '100',
+        })
       })
 
       it('Can like a blog', function () {
@@ -69,26 +81,43 @@ describe('Blog app', function () {
         cy.get('@theBlog').contains('view').click()
         cy.get('@theBlog').should('contain', '1')
 
-        cy.get('@theBlog').contains('like').click()
+        cy.get('@theBlog').get('#likeButton').click()
         cy.get('@theBlog').should('contain', '2')
       })
 
-      it('Can remove self owned blog', function () {
-        cy.contains('A nice new blog').parent().parent().as('theBlog')
+      it.only('Can remove self owned blog', function () {
+        cy.contains('A nice new blog').parent().as('theBlog')
         cy.get('@theBlog').contains('view').click()
         cy.get('@theBlog').contains('remove').click()
 
         cy.contains('Successfully removed blog A nice new blog!')
-        cy.get('html').should('not.contain', 'Marquez')
       })
 
-      it.only('Can not remove somebody elses blog', function () {
+      it('Can not remove somebody elses blog', function () {
         cy.contains('logout').click()
         cy.login({ username: 'Seconder', password: 'seconder' })
 
         cy.contains('A nice new blog').parent().parent().as('theBlog')
         cy.get('@theBlog').contains('view').click()
         cy.get('@theBlog').should('not.contain', 'remove')
+      })
+
+      it('Blogs load in correct order', function () {
+        cy.get('.blog-class').eq(0).contains('Most likes')
+        cy.get('.blog-class').eq(1).contains('Second most likes')
+      })
+
+      it('Blogs reorder according to likes', function () {
+        cy.contains('Second most likes').parent().as('aBlog')
+        cy.get('@aBlog').contains('view').click()
+        cy.get('@aBlog').should('contain', '100')
+        cy.get('@aBlog').get('#likeButton').click()
+        cy.get('@aBlog').should('contain', '101')
+        cy.get('@aBlog').get('#likeButton').click()
+        cy.get('@aBlog').should('contain', '102')
+
+        cy.get('.blog-class').eq(0).contains('Second most likes')
+        cy.get('.blog-class').eq(1).contains('Most likes')
       })
     })
   })
